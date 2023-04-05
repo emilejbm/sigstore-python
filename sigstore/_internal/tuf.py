@@ -115,6 +115,8 @@ class TrustUpdater:
         """
         self._repo_url = url
         self._metadata_dir, self._targets_dir = _get_dirs(url)
+        # change to get from args
+        self.offline = True
 
         rsrc_prefix: str
         if self._repo_url == DEFAULT_TUF_URL:
@@ -174,12 +176,15 @@ class TrustUpdater:
             target_base_url=parse.urljoin(f"{self._repo_url}/", "targets/"),
             target_dir=str(self._targets_dir),
             fetcher=_get_fetcher(),
+            offline=self.offline
         )
 
         # NOTE: we would like to avoid refresh if the toplevel metadata is valid.
         # https://github.com/theupdateframework/python-tuf/issues/2225
         try:
             updater.refresh()
+        except TUFExceptions.ExpiredMetadataError as exp_e:
+            raise TUFError("Local metadata is not available and you are in offline mode") from exp_e
         except Exception as e:
             raise TUFError("Failed to refresh TUF metadata") from e
 
@@ -191,14 +196,19 @@ class TrustUpdater:
         if root_info is None:
             raise TUFError("Unsupported TUF configuration: no trusted root")
         path = self._updater().find_cached_target(root_info)
+        # might have to change something here
         if path is None:
             try:
                 path = self._updater().download_target(root_info)
+            except TUFExceptions.ExpiredMetadataError as exp_e:
+                raise NameError("Local metadata is not available and you are in offline mode") from exp_e
             except (
                 TUFExceptions.DownloadError,
                 TUFExceptions.RepositoryError,
             ) as e:
                 raise TUFError("Failed to download trusted key bundle") from e
+            
+
 
         logger.debug("Found trusted root")
         return TrustedRoot().from_json(Path(path).read_bytes())

@@ -370,10 +370,11 @@ six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
     # via python-dateutil
-tuf==2.1.0 \
-    --hash=sha256:ab22d1143d4d8aa20c94d243de27eedc8cd517e251ddaf4a88c10952358a13ea \
-    --hash=sha256:dbfe18fbdeba6d76144931db88b76e473fa40c431b60d25b455a9adbb07c2397
+# tuf==2.1.0 \
+#     --hash=sha256:ab22d1143d4d8aa20c94d243de27eedc8cd517e251ddaf4a88c10952358a13ea \
+#     --hash=sha256:dbfe18fbdeba6d76144931db88b76e473fa40c431b60d25b455a9adbb07c2397
     # via sigstore
+git+https://github.com/emboman13/python-tuf-lazy-refresh/tree/offline.git
 typing-extensions==4.5.0 \
     --hash=sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb \
     --hash=sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4
