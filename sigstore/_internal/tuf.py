@@ -34,7 +34,7 @@ from sigstore_protobuf_specs.dev.sigstore.trustroot.v1 import (
     TrustedRoot,
 )
 from tuf.api import exceptions as TUFExceptions
-from tuf.ngclient import RequestsFetcher, Updater
+from tuf.ngclient import RequestsFetcher, Updater, config
 
 from sigstore._utils import read_embedded
 from sigstore.errors import MetadataError, RootError, TUFError
@@ -170,13 +170,17 @@ class TrustUpdater:
     @lru_cache()
     def _updater(self) -> Updater:
         """Initialize and update the toplevel TUF metadata"""
+        if self.offline:
+            configClass = config.UpdaterConfig(offline=True)
+        else:
+            configClass = config.UpdaterConfig()
         updater = Updater(
             metadata_dir=str(self._metadata_dir),
             metadata_base_url=self._repo_url,
             target_base_url=parse.urljoin(f"{self._repo_url}/", "targets/"),
             target_dir=str(self._targets_dir),
             fetcher=_get_fetcher(),
-            offline=self.offline
+            config=configClass
         )
 
         # NOTE: we would like to avoid refresh if the toplevel metadata is valid.
