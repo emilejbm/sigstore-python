@@ -34,7 +34,7 @@ from sigstore_protobuf_specs.dev.sigstore.trustroot.v1 import (
     TrustedRoot,
 )
 from tuf.api import exceptions as TUFExceptions
-from tuf.ngclient import RequestsFetcher, Updater, config
+from tuf.ngclient import RequestsFetcher, Updater, config, config
 
 from sigstore._utils import read_embedded
 from sigstore.errors import MetadataError, RootError, TUFError
@@ -115,7 +115,6 @@ class TrustUpdater:
         """
         self._repo_url = url
         self._metadata_dir, self._targets_dir = _get_dirs(url)
-        # change to get from args
         self.offline = True
 
         rsrc_prefix: str
