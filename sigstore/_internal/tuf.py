@@ -34,7 +34,7 @@ from sigstore_protobuf_specs.dev.sigstore.trustroot.v1 import (
     TrustedRoot,
 )
 from tuf.api import exceptions as TUFExceptions
-from tuf.ngclient import RequestsFetcher, Updater, config, config
+from tuf.ngclient import RequestsFetcher, Updater, config
 
 from sigstore._utils import read_embedded
 from sigstore.errors import MetadataError, RootError, TUFError
@@ -115,7 +115,9 @@ class TrustUpdater:
         """
         self._repo_url = url
         self._metadata_dir, self._targets_dir = _get_dirs(url)
-        self.offline = True
+        # Check for offline and lazy_refresh flags
+        self.offline = "--offline" in sys.argv
+        self.lazy_refresh = "--lazy_refresh" in sys.argv
 
         rsrc_prefix: str
         if self._repo_url == DEFAULT_TUF_URL:
@@ -169,10 +171,7 @@ class TrustUpdater:
     @lru_cache()
     def _updater(self) -> Updater:
         """Initialize and update the toplevel TUF metadata"""
-        if self.offline:
-            configClass = config.UpdaterConfig(offline=True)
-        else:
-            configClass = config.UpdaterConfig()
+        configClass = config.UpdaterConfig(offline=self.offline, lazy_refresh=self.lazy_refresh)
         updater = Updater(
             metadata_dir=str(self._metadata_dir),
             metadata_base_url=self._repo_url,
