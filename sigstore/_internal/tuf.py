@@ -185,10 +185,10 @@ class TrustUpdater:
         # https://github.com/theupdateframework/python-tuf/issues/2225
         try:
             updater.refresh()
-        except TUFExceptions.ExpiredMetadataError as exp_e:
+        except TUFExceptions.NetworkUnavailableError as network_e:
             raise TUFError(
                 "Local metadata is not available and you are in offline mode"
-            ) from exp_e
+            ) from network_e
         except Exception as e:
             raise TUFError("Failed to refresh TUF metadata") from e
 
