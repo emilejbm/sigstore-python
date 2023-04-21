@@ -115,7 +115,7 @@ class TrustUpdater:
         """
         self._repo_url = url
         self._metadata_dir, self._targets_dir = _get_dirs(url)
-        # Check for offline and lazy_refresh flags
+        # Check for offline flag
         self.offline = "--offline" in sys.argv
         self.lazy_refresh = "--lazy_refresh" in sys.argv
 
@@ -171,7 +171,7 @@ class TrustUpdater:
     @lru_cache()
     def _updater(self) -> Updater:
         """Initialize and update the toplevel TUF metadata"""
-        configClass = config.UpdaterConfig(offline=self.offline, lazy_refresh=self.lazy_refresh)
+        configClass = config.UpdaterConfig(offline=self.offline)
         updater = Updater(
             metadata_dir=str(self._metadata_dir),
             metadata_base_url=self._repo_url,
