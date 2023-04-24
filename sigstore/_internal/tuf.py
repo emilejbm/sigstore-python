@@ -19,6 +19,7 @@ TUF functionality for `sigstore-python`.
 from __future__ import annotations
 
 import logging
+import sys
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -117,7 +118,6 @@ class TrustUpdater:
         self._metadata_dir, self._targets_dir = _get_dirs(url)
         # Check for offline flag
         self.offline = "--offline" in sys.argv
-        self.lazy_refresh = "--lazy_refresh" in sys.argv
 
         rsrc_prefix: str
         if self._repo_url == DEFAULT_TUF_URL:
