@@ -19,6 +19,7 @@ TUF functionality for `sigstore-python`.
 from __future__ import annotations
 
 import logging
+import sys
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -115,8 +116,8 @@ class TrustUpdater:
         """
         self._repo_url = url
         self._metadata_dir, self._targets_dir = _get_dirs(url)
-        # change to get from args
-        self.offline = True
+        # Check for offline flag
+        self.offline = "--offline" in sys.argv
 
         rsrc_prefix: str
         if self._repo_url == DEFAULT_TUF_URL:
@@ -170,10 +171,7 @@ class TrustUpdater:
     @lru_cache()
     def _updater(self) -> Updater:
         """Initialize and update the toplevel TUF metadata"""
-        if self.offline:
-            configClass = config.UpdaterConfig(offline=True)
-        else:
-            configClass = config.UpdaterConfig()
+        configClass = config.UpdaterConfig(offline=self.offline)
         updater = Updater(
             metadata_dir=str(self._metadata_dir),
             metadata_base_url=self._repo_url,
@@ -187,10 +185,10 @@ class TrustUpdater:
         # https://github.com/theupdateframework/python-tuf/issues/2225
         try:
             updater.refresh()
-        except TUFExceptions.ExpiredMetadataError as exp_e:
+        except TUFExceptions.NetworkUnavailableError as network_e:
             raise TUFError(
                 "Local metadata is not available and you are in offline mode"
-            ) from exp_e
+            ) from network_e
         except Exception as e:
             raise TUFError("Failed to refresh TUF metadata") from e
 
